@@ -8,7 +8,6 @@ import net.datafaker.Faker;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.random.RandomGenerator;
 
 @Named("memoryTaskService")
 @ApplicationScoped
@@ -89,5 +88,10 @@ public class MemoryTaskService implements TaskService {
         if (!removed) {
             throw new NoSuchElementException("Could not find Task with id: " + id);
         }
+    }
+
+    @Override
+    public void deleteAllTasks() {
+        tasks.clear();
     }
 }
