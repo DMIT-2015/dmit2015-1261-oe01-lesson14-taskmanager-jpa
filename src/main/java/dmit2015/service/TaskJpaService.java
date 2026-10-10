@@ -46,7 +46,7 @@ public class TaskJpaService implements TaskService {
 
     @Override
     public List<Task> getAllTasks() {
-        return entityManager.createQuery("SELECT o FROM Task o ORDER BY o.createTime DESC", Task.class)
+        return entityManager.createQuery("SELECT o FROM Task o", Task.class)
                 .getResultList();
     }
 
@@ -62,11 +62,11 @@ public class TaskJpaService implements TaskService {
             var existingTask = optionalTask.orElseThrow();
             // Update only properties that is editable by the end user
 
-//            existingTask.setDescription(task.getDescription());
-//            existingTask.setPriority(task.getPriority());
-//            existingTask.setDone(task.isDone());
+            existingTask.setDescription(task.getDescription());
+            existingTask.setPriority(task.getPriority());
+            existingTask.setDone(task.isDone());
 
-//            task = entityManager.merge(existingTask);
+            task = entityManager.merge(existingTask);
         }
         return task;
     }

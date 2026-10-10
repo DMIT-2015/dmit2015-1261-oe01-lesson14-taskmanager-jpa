@@ -13,6 +13,8 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
+import org.jboss.arquillian.transaction.api.annotation.TransactionMode;
+import org.jboss.arquillian.transaction.api.annotation.Transactional;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -29,6 +31,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Transactional(TransactionMode.ROLLBACK)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ArquillianTest
@@ -72,8 +75,8 @@ public class TaskJpaServiceIT { // The class must be declared as public
     @Named("jakartaPersistenceTaskService")
     private TaskService taskService;
 
-    @Resource
-    private UserTransaction beanManagedTransaction;
+//    @Resource
+//    private UserTransaction beanManagedTransaction;
 
     @BeforeAll
     static void beforeAllTests() {
@@ -88,13 +91,13 @@ public class TaskJpaServiceIT { // The class must be declared as public
     @BeforeEach
     void beforeEachTestMethod() throws SystemException, NotSupportedException {
         // Start a new transaction
-        beanManagedTransaction.begin();
+//        beanManagedTransaction.begin();
     }
 
     @AfterEach
     void afterEachTestMethod() throws SystemException {
         // Rollback the transaction
-        beanManagedTransaction.rollback();
+//        beanManagedTransaction.rollback();
     }
 
     @Test
@@ -140,6 +143,7 @@ public class TaskJpaServiceIT { // The class must be declared as public
 
     }
 
+    @Transactional(TransactionMode.DISABLED)
     @Order(4)
     @Test
     void givenExistingEntity_whenUpdatedTask_thenTaskIsUpdated() {
@@ -161,7 +165,7 @@ public class TaskJpaServiceIT { // The class must be declared as public
         var existingTask = optionalTask.orElseThrow();
         assertThat(existingTask)
                 .usingRecursiveComparison()
-                // .ignoringFields("field1", "field2")
+                 .ignoringFields("createTime", "updateTime","version")
                 .isEqualTo(updatedTask);
 
     }
@@ -215,13 +219,13 @@ public class TaskJpaServiceIT { // The class must be declared as public
         var firstActualTask = taskList.getFirst();
         assertThat(firstActualTask)
                 .usingRecursiveComparison()
-                // .ignoringFields("field1", "field2")
+                 .ignoringFields("createTime", "updateTime")
                 .isEqualTo(firstExpectedTask);
         // Get the last entity and compare with expected results
         var lastActualTask = taskList.getLast();
         assertThat(lastActualTask)
                 .usingRecursiveComparison()
-                // .ignoringFields("field1", "field2")
+                .ignoringFields("createTime", "updateTime")
                 .isEqualTo(lastExpectedTask);
 
     }
